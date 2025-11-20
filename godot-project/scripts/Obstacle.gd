@@ -2,7 +2,7 @@ extends Node2D
 
 signal scored
 
-const MOVE_SPEED = 150.0
+const MOVE_SPEED = 120.0 # Reduced from 150.0
 
 func _process(delta):
 	position.x -= MOVE_SPEED * delta

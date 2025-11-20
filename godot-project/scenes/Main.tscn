@@ -19,7 +19,7 @@ position = Vector2(240, 360)
 position = Vector2(100, 350)
 
 [node name="ObstacleTimer" type="Timer" parent="."]
-wait_time = 1.5
+wait_time = 2.0
 
 [node name="Ground1" type="StaticBody2D" parent="."]
 position = Vector2(0, 670)

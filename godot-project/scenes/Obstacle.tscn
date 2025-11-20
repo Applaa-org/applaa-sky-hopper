@@ -6,16 +6,16 @@
 size = Vector2(80, 600)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_score"]
-size = Vector2(20, 200)
+size = Vector2(20, 250)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_notifier"]
-size = Vector2(82, 822)
+size = Vector2(82, 922)
 
 [node name="Obstacle" type="Node2D"]
 script = ExtResource("1_obstacle_script")
 
 [node name="TopPipe" type="StaticBody2D" parent="."]
-position = Vector2(0, -400)
+position = Vector2(0, -450)
 collision_layer = 2
 collision_mask = 1
 
@@ -28,7 +28,7 @@ texture = ExtResource("res://icon.svg")
 shape = SubResource("RectangleShape2D_pipe")
 
 [node name="BottomPipe" type="StaticBody2D" parent="."]
-position = Vector2(0, 400)
+position = Vector2(0, 450)
 collision_layer = 2
 collision_mask = 1
 
@@ -45,6 +45,7 @@ collision_layer = 0
 collision_mask = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ScoreArea"]
+position = Vector2(0, 0.5)
 shape = SubResource("RectangleShape2D_score")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]

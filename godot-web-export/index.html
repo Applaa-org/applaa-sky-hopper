@@ -61,23 +61,25 @@
         const player = {
             x: 100,
             y: 350,
-            radius: 20,
+            radius: 16,
             velocityY: 0,
-            color: '#f1c40f'
+            color: '#f1c40f',
+            rotation: 0
         };
 
-        const gravity = 0.6;
-        const flapStrength = -10;
-        const obstacleSpeed = -3;
-        const obstacleGap = 200;
+        const gravity = 0.5;
+        const flapStrength = -9;
+        const obstacleSpeed = -2.5; // Slower
+        const obstacleGap = 250; // Wider gap
         const obstacleWidth = 80;
-        const obstacleInterval = 100;
+        const obstacleInterval = 120; // More time between spawns
 
         let obstacles = [];
 
         function resetGame() {
             player.y = 350;
             player.velocityY = 0;
+            player.rotation = 0;
             score = 0;
             obstacles = [];
             frameCount = 0;
@@ -108,6 +110,7 @@
 
             player.velocityY += gravity;
             player.y += player.velocityY;
+            player.rotation = player.velocityY * 0.05; // Rotate based on velocity
 
             if (player.y + player.radius > 720 - 50) { // Ground collision
                 gameState = 'gameOver';
@@ -120,7 +123,7 @@
 
             frameCount++;
             if (frameCount % obstacleInterval === 0) {
-                const gapY = Math.random() * (canvas.height - obstacleGap - 250) + 125;
+                const gapY = Math.random() * (canvas.height - obstacleGap - 300) + 150;
                 obstacles.push({
                     x: canvas.width,
                     y: gapY,
@@ -148,6 +151,30 @@
 
             obstacles = obstacles.filter(obs => obs.x + obstacleWidth > 0);
         }
+        
+        function drawPlayer() {
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.rotate(player.rotation);
+            
+            // Body
+            ctx.fillStyle = player.color;
+            ctx.beginPath();
+            ctx.moveTo(-15, 0);
+            ctx.lineTo(0, -15);
+            ctx.lineTo(15, 0);
+            ctx.lineTo(0, 15);
+            ctx.closePath();
+            ctx.fill();
+
+            // Eye
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(5, -3, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
 
         function render() {
             ctx.fillStyle = '#73badb';
@@ -170,14 +197,11 @@
                 ctx.fillStyle = 'white';
                 ctx.font = '48px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('Sky Hopper', canvas.width / 2, canvas.height / 2 - 50);
+                ctx.fillText('Sky Hopper', canvas.width / 2, canvas.height / 2 - 80);
                 ctx.font = '24px Arial';
-                ctx.fillText('Tap or Press Space to Start', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('Tap or Press Space to Flap', canvas.width / 2, canvas.height / 2 - 20);
             } else if (gameState === 'playing' || gameState === 'gameOver') {
-                ctx.fillStyle = player.color;
-                ctx.beginPath();
-                ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-                ctx.fill();
+                drawPlayer();
                 
                 ctx.fillStyle = 'white';
                 ctx.font = '60px Arial';

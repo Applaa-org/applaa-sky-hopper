@@ -16,7 +16,7 @@ func update_score(new_score):
 	score_label.text = str(new_score)
 
 func show_start_screen():
-	message_label.text = "Sky Hopper"
+	message_label.text = "Sky Hopper\n\nTap or Space to Flap"
 	message_label.show()
 	start_button.text = "Start"
 	start_button.show()
@@ -38,5 +38,4 @@ func show_game_over_screen(final_score):
 	start_button.hide()
 
 func _on_start_button_pressed():
-	# Emit a signal instead of a direct call. This is much more reliable.
 	emit_signal("start_game")

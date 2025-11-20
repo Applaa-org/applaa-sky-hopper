@@ -1,90 +1,84 @@
-[gd_scene load_steps=8 format=3 uid="uid://c54444444444"]
+[gd_scene load_steps=7 format=3 uid="uid://c54444444444"]
 
-[ext_resource type="Script" path="res://scripts/Player.gd" id="1_abcde"]
+[ext_resource type="Script" path="res://scripts/Player.gd" id="1_player"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_12345"]
-radius = 18.0
-height = 40.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
+radius = 16.0
 
 [sub_resource type="Animation" id="Animation_flap"]
 resource_name = "flap"
-length = 0.4
+length = 0.3
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:scale")
+tracks/0/path = NodePath("BirdShape:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.4),
+"times": PackedFloat32Array(0, 0.1, 0.3),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(1, 1), Vector2(1.2, 0.8), Vector2(1, 1)]
 }
 
-[sub_resource type="Animation" id="Animation_idle"]
-resource_name = "idle"
-length = 1.0
-loop_mode = 1
+[sub_resource type="Animation" id="Animation_RESET"]
+length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:position")
-tracks/0/interp = 2
+tracks/0/path = NodePath("BirdShape:scale")
+tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.5, 1),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0, -5), Vector2(0, 5), Vector2(0, -5)]
+"values": [Vector2(1, 1)]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_abcde"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_player"]
 _data = {
-"flap": SubResource("Animation_flap"),
-"idle": SubResource("Animation_idle")
+"RESET": SubResource("Animation_RESET"),
+"flap": SubResource("Animation_flap")
 }
 
-[sub_resource type="Gradient" id="Gradient_12345"]
-colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_12345"]
-gradient = SubResource("Gradient_12345")
-fill = 1
-fill_from = Vector2(0.5, 0.5)
+[sub_resource type="Gradient" id="Gradient_trail"]
+colors = PackedColorArray(1, 0.964706, 0.498039, 1, 1, 0.964706, 0.498039, 0)
 
 [node name="Player" type="CharacterBody2D"]
-script = ExtResource("1_abcde")
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-modulate = Color(0.290196, 0.564706, 0.870588, 1)
-scale = Vector2(1.25, 1.25)
-texture = ExtResource("res://icon.svg")
+collision_layer = 1
+collision_mask = 2
+script = ExtResource("1_player")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CapsuleShape2D_12345")
+shape = SubResource("CircleShape2D_player")
+
+[node name="BirdShape" type="Polygon2D" parent="."]
+color = Color(0.945098, 0.768627, 0.0588235, 1)
+polygon = PackedVector2Array(-15, 0, 0, -15, 15, 0, 0, 15)
+
+[node name="Eye" type="Polygon2D" parent="BirdShape"]
+position = Vector2(5, -3)
+color = Color(0.180392, 0.180392, 0.180392, 1)
+polygon = PackedVector2Array(0, -3, 3, 0, 0, 3, -3, 0)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_abcde")
+"": SubResource("AnimationLibrary_player")
 }
-autoplay = "idle"
 
-[node name="TrailParticles" type="CPUParticles2D" parent="."]
-position = Vector2(-25, 0)
+[node name="TrailParticles" type="GPUParticles2D" parent="."]
+position = Vector2(-15, 0)
 emitting = false
-amount = 16
-lifetime = 0.3
+amount = 32
+process_material = 7
+lifetime = 0.5
 one_shot = true
 explosiveness = 0.8
-emission_shape = 1
-emission_sphere_radius = 5.0
-direction = Vector2(0, 1)
-spread = 20.0
-gravity = Vector2(0, 0)
-initial_velocity_min = 20.0
-initial_velocity_max = 40.0
-scale_amount_min = 2.0
-scale_amount_max = 4.0
-color = Color(1, 1, 1, 0.501961)
-color_ramp = SubResource("GradientTexture2D_12345")
+process_material.direction = Vector3(1, 0, 0)
+process_material.spread = 30.0
+process_material.gravity = Vector3(0, 0, 0)
+process_material.initial_velocity = 50.0
+process_material.scale = 5.0
+process_material.scale_curve = SubResource("Gradient_trail")
+process_material.color_ramp = SubResource("Gradient_trail")
