@@ -2,15 +2,24 @@ extends Node2D
 
 signal scored
 
-const MOVE_SPEED = 120.0 # Reduced from 150.0
+var move_speed = 120.0
+
+@onready var top_pipe = $TopPipe
+@onready var bottom_pipe = $BottomPipe
+@onready var score_area_shape = $ScoreArea/CollisionShape2D
 
 func _process(delta):
-	position.x -= MOVE_SPEED * delta
+	position.x -= move_speed * delta
+
+func set_gap(gap_size):
+	var half_gap = gap_size / 2
+	top_pipe.position.y = -half_gap - (top_pipe.get_node("CollisionShape2D").shape.size.y / 2)
+	bottom_pipe.position.y = half_gap + (bottom_pipe.get_node("CollisionShape2D").shape.size.y / 2)
+	score_area_shape.shape.size.y = gap_size
 
 func _on_score_area_body_entered(body):
 	if body is Player:
 		emit_signal("scored")
-		# Disable the area so it doesn't score again
 		$ScoreArea.monitoring = false
 
 func stop():

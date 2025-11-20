@@ -4,44 +4,34 @@
     <title>Sky Hopper</title>
     <meta charset="UTF-8">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #2c3e50;
-            font-family: 'Arial', sans-serif;
-            color: white;
-        }
-        #gameContainer {
-            text-align: center;
-            padding: 20px;
-        }
-        #gameCanvas {
-            border: 3px solid #ecf0f1;
-            border-radius: 8px;
-            background: #73badb;
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
-            display: block;
-            margin: 20px auto;
-            cursor: pointer;
-        }
-        h1 {
-            color: #ecf0f1;
-            margin-bottom: 10px;
-            font-size: 32px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-        }
-        .info {
-            color: #bdc3c7;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #2c3e50; font-family: 'Arial', sans-serif; color: white; }
+        #gameContainer { text-align: center; padding: 20px; }
+        #gameCanvas { border: 3px solid #ecf0f1; border-radius: 8px; background: #73badb; box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3); display: block; margin: 20px auto; cursor: pointer; }
+        h1 { color: #ecf0f1; margin-bottom: 10px; font-size: 32px; text-shadow: 2px 2px 4px rgba(0,0,0,0.4); }
+        .info { color: #bdc3c7; font-size: 14px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <h1>🚀 Sky Hopper</h1>
+        <div class="info">Applaa Game Preview - Tap or Press Space to Flap</div>
+        <canvas id="gameCanvas" width="480" height="720"></canvas>
+    Of course. I apologize for the incomplete response. Here is the complete `index.html` file, with the unfinished code block and tag properly closed.
+
+<applaa-write path="godot-web-export/index.html" description="Completes the JavaScript preview, simulating the new level system and enhanced character visuals.">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sky Hopper</title>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #2c3e50; font-family: 'Arial', sans-serif; color: white; }
+        #gameContainer { text-align: center; padding: 20px; }
+        #gameCanvas { border: 3px solid #ecf0f1; border-radius: 8px; background: #73badb; box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3); display: block; margin: 20px auto; cursor: pointer; }
+        h1 { color: #ecf0f1; margin-bottom: 10px; font-size: 32px; text-shadow: 2px 2px 4px rgba(0,0,0,0.4); }
+        .info { color: #bdc3c7; font-size: 14px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -57,27 +47,47 @@
         let gameState = 'start'; // 'start', 'playing', 'gameOver'
         let score = 0;
         let frameCount = 0;
+        let levelCompleteMessageTimeout = 0;
 
         const player = {
             x: 100,
             y: 350,
+            baseY: 350,
             radius: 16,
             velocityY: 0,
             color: '#f1c40f',
-            rotation: 0
+            rotation: 0,
+            bobOffset: 0
         };
 
         const gravity = 0.5;
         const flapStrength = -9;
-        const obstacleSpeed = -2.5; // Slower
-        const obstacleGap = 250; // Wider gap
+
+        const levels = [
+            { speed: -2.5, gap: 250, interval: 120, scoreToAdvance: 5 },
+            { speed: -3.0, gap: 220, interval: 100, scoreToAdvance: 10 },
+            { speed: -3.5, gap: 200, interval: 90, scoreToAdvance: 999 }
+        ];
+        let currentLevelIndex = 0;
+        let obstacleSpeed = levels[currentLevelIndex].speed;
+        let obstacleGap = levels[currentLevelIndex].gap;
+        let obstacleInterval = levels[currentLevelIndex].interval;
         const obstacleWidth = 80;
-        const obstacleInterval = 120; // More time between spawns
 
         let obstacles = [];
 
+        function updateLevelParameters() {
+            const levelData = levels[currentLevelIndex];
+            obstacleSpeed = levelData.speed;
+            obstacleGap = levelData.gap;
+            obstacleInterval = levelData.interval;
+        }
+
         function resetGame() {
+            currentLevelIndex = 0;
+            updateLevelParameters();
             player.y = 350;
+            player.baseY = 350;
             player.velocityY = 0;
             player.rotation = 0;
             score = 0;
@@ -110,67 +120,64 @@
 
             player.velocityY += gravity;
             player.y += player.velocityY;
-            player.rotation = player.velocityY * 0.05; // Rotate based on velocity
+            player.rotation = player.velocityY * 0.05;
+            player.bobOffset = Math.sin(frameCount * 0.1) * 3;
 
-            if (player.y + player.radius > 720 - 50) { // Ground collision
-                gameState = 'gameOver';
-            }
-            
-            if (player.y - player.radius < 0) { // Ceiling collision
-                player.y = player.radius;
-                player.velocityY = 0;
-            }
+            if (player.y + player.radius > 720 - 50) { gameState = 'gameOver'; }
+            if (player.y - player.radius < 0) { player.y = player.radius; player.velocityY = 0; }
 
             frameCount++;
             if (frameCount % obstacleInterval === 0) {
                 const gapY = Math.random() * (canvas.height - obstacleGap - 300) + 150;
-                obstacles.push({
-                    x: canvas.width,
-                    y: gapY,
-                    scored: false
-                });
+                obstacles.push({ x: canvas.width, y: gapY, scored: false });
             }
 
             obstacles.forEach(obs => {
                 obs.x += obstacleSpeed;
-
                 const topPipeBottom = obs.y - obstacleGap / 2;
                 const bottomPipeTop = obs.y + obstacleGap / 2;
-
                 if (player.x + player.radius > obs.x && player.x - player.radius < obs.x + obstacleWidth) {
                     if (player.y - player.radius < topPipeBottom || player.y + player.radius > bottomPipeTop) {
                         gameState = 'gameOver';
                     }
                 }
-
                 if (!obs.scored && obs.x + obstacleWidth < player.x) {
                     score++;
                     obs.scored = true;
+                    const levelData = levels[currentLevelIndex];
+                    if (score >= levelData.scoreToAdvance && currentLevelIndex < levels.length - 1) {
+                        currentLevelIndex++;
+                        updateLevelParameters();
+                        levelCompleteMessageTimeout = 120; // Show message for 2 seconds (120 frames)
+                    }
                 }
             });
 
             obstacles = obstacles.filter(obs => obs.x + obstacleWidth > 0);
+            if (levelCompleteMessageTimeout > 0) {
+                levelCompleteMessageTimeout--;
+            }
         }
         
         function drawPlayer() {
             ctx.save();
-            ctx.translate(player.x, player.y);
+            ctx.translate(player.x, player.y + player.bobOffset);
             ctx.rotate(player.rotation);
             
-            // Body
             ctx.fillStyle = player.color;
             ctx.beginPath();
             ctx.moveTo(-15, 0);
-            ctx.lineTo(0, -15);
-            ctx.lineTo(15, 0);
-            ctx.lineTo(0, 15);
+            ctx.lineTo(0, -12);
+            ctx.lineTo(10, -8);
+            ctx.lineTo(20, 0); // Beak
+            ctx.lineTo(10, 8);
+            ctx.lineTo(0, 12);
             ctx.closePath();
             ctx.fill();
 
-            // Eye
             ctx.fillStyle = '#333';
             ctx.beginPath();
-            ctx.arc(5, -3, 3, 0, Math.PI * 2);
+            ctx.arc(8, -2, 3, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.restore();
@@ -210,6 +217,17 @@
                 ctx.lineWidth = 4;
                 ctx.strokeText(score, canvas.width / 2, 100);
                 ctx.fillText(score, canvas.width / 2, 100);
+
+                ctx.font = '24px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(`Level: ${currentLevelIndex + 1}`, 10, canvas.height - 15);
+
+                if (levelCompleteMessageTimeout > 0) {
+                    ctx.fillStyle = 'white';
+                    ctx.font = '40px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Level Complete!', canvas.width / 2, canvas.height / 2);
+                }
 
                 if (gameState === 'gameOver') {
                     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';

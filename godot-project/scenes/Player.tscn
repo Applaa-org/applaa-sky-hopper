@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://c54444444444"]
+[gd_scene load_steps=9 format=3 uid="uid://c54444444444"]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_player"]
 
@@ -21,6 +21,23 @@ tracks/0/keys = {
 "values": [Vector2(1, 1), Vector2(1.2, 0.8), Vector2(1, 1)]
 }
 
+[sub_resource type="Animation" id="Animation_bob"]
+resource_name = "bob"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BirdShape:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, -3), Vector2(0, 3)]
+}
+
 [sub_resource type="Animation" id="Animation_RESET"]
 length = 0.001
 tracks/0/type = "value"
@@ -35,15 +52,32 @@ tracks/0/keys = {
 "update": 0,
 "values": [Vector2(1, 1)]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BirdShape:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_player"]
 _data = {
 "RESET": SubResource("Animation_RESET"),
+"bob": SubResource("Animation_bob"),
 "flap": SubResource("Animation_flap")
 }
 
 [sub_resource type="Gradient" id="Gradient_trail"]
-colors = PackedColorArray(1, 0.964706, 0.498039, 1, 1, 0.964706, 0.498039, 0)
+offsets = PackedFloat32Array(0, 0.561644, 1)
+colors = PackedColorArray(1, 0.964706, 0.498039, 1, 1, 0.588235, 0.2, 0.815686, 1, 0.2, 0.2, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_1"]
+gradient = SubResource("Gradient_trail")
 
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 1
@@ -55,10 +89,10 @@ shape = SubResource("CircleShape2D_player")
 
 [node name="BirdShape" type="Polygon2D" parent="."]
 color = Color(0.945098, 0.768627, 0.0588235, 1)
-polygon = PackedVector2Array(-15, 0, 0, -15, 15, 0, 0, 15)
+polygon = PackedVector2Array(-15, 0, 0, -12, 10, -8, 20, 0, 10, 8, 0, 12)
 
 [node name="Eye" type="Polygon2D" parent="BirdShape"]
-position = Vector2(5, -3)
+position = Vector2(8, -2)
 color = Color(0.180392, 0.180392, 0.180392, 1)
 polygon = PackedVector2Array(0, -3, 3, 0, 0, 3, -3, 0)
 
@@ -70,15 +104,14 @@ libraries = {
 [node name="TrailParticles" type="GPUParticles2D" parent="."]
 position = Vector2(-15, 0)
 emitting = false
-amount = 32
+amount = 48
 process_material = 7
-lifetime = 0.5
+lifetime = 0.6
 one_shot = true
-explosiveness = 0.8
-process_material.direction = Vector3(1, 0, 0)
-process_material.spread = 30.0
+explosiveness = 0.9
+process_material.direction = Vector3(-1, 0, 0)
+process_material.spread = 25.0
 process_material.gravity = Vector3(0, 0, 0)
-process_material.initial_velocity = 50.0
-process_material.scale = 5.0
-process_material.scale_curve = SubResource("Gradient_trail")
-process_material.color_ramp = SubResource("Gradient_trail")
+process_material.initial_velocity = 80.0
+process_material.scale = 6.0
+process_material.color_ramp = SubResource("GradientTexture1D_1")

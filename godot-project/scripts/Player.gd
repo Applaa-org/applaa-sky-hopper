@@ -5,7 +5,7 @@ signal hit
 const FLAP_VELOCITY = -350.0
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
-@onready var sprite = $Sprite2D
+@onready var bird_shape = $BirdShape
 @onready var animation_player = $AnimationPlayer
 @onready var trail = $TrailParticles
 @onready var collision_shape = $CollisionShape2D
@@ -19,7 +19,7 @@ func _ready():
 func _physics_process(delta):
 	velocity.y += gravity * delta
 	
-	sprite.rotation = lerp_angle(sprite.rotation, deg_to_rad(velocity.y / 20.0), delta * 5)
+	bird_shape.rotation = lerp_angle(bird_shape.rotation, deg_to_rad(velocity.y / 20.0), delta * 5)
 
 	var collision = move_and_collide(velocity * delta)
 	if collision:
@@ -41,20 +41,22 @@ func start():
 	trail.emitting = true
 	position = Vector2(100, 350)
 	velocity = Vector2.ZERO
-	sprite.rotation = 0
-	sprite.modulate = Color.WHITE
+	bird_shape.rotation = 0
+	bird_shape.modulate = Color.WHITE
+	animation_player.play("bob")
 	show()
 
 func die():
-	if is_dead: return # Prevent dying multiple times
+	if is_dead: return
 	is_dead = true
 	
 	set_physics_process(false)
 	collision_shape.disabled = true
 	trail.emitting = false
+	animation_player.stop()
 	emit_signal("hit")
 	
 	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.RED, 0.1)
+	tween.tween_property(bird_shape, "modulate", Color.RED, 0.1)
 	await tween.finished
 	hide()
