@@ -2,8 +2,8 @@ extends CharacterBody2D
 
 signal hit
 
-const FLAP_VELOCITY = -450.0
-var gravity = ProjectSettings.get_setting("physics/2d/default_gravity") * 1.5 # Increased gravity
+const FLAP_VELOCITY = -350.0
+var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @onready var bird_shape = $BirdShape
 @onready var animation_player = $AnimationPlayer
@@ -20,8 +20,7 @@ func _ready():
 func _physics_process(delta):
 	velocity.y += gravity * delta
 	
-	# More responsive rotation
-	bird_shape.rotation = lerp_angle(bird_shape.rotation, deg_to_rad(velocity.y / 10.0), delta * 5)
+	bird_shape.rotation = lerp_angle(bird_shape.rotation, deg_to_rad(velocity.y / 20.0), delta * 5)
 
 	var collision = move_and_collide(velocity * delta)
 	if collision:

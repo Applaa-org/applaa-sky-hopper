@@ -1,21 +1,15 @@
-[gd_scene load_steps=6 format=3 uid="uid://d66666666666"]
+[gd_scene load_steps=5 format=3 uid="uid://d66666666666"]
 
 [ext_resource type="Script" path="res://scripts/Obstacle.gd" id="1_obstacle_script"]
-
-[sub_resource type="Gradient" id="Gradient_pipe"]
-offsets = PackedFloat32Array(0, 0.246575, 0.506849, 1)
-colors = PackedColorArray(0.184314, 0.6, 0.368627, 1, 0.25098, 0.803922, 0.501961, 1, 0.14902, 0.54902, 0.337255, 1, 0.113725, 0.415686, 0.254902, 1)
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_pipe"]
-gradient = SubResource("Gradient_pipe")
-width = 80
-height = 600
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pipe"]
 size = Vector2(80, 600)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_score"]
 size = Vector2(20, 250)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_notifier"]
+size = Vector2(82, 922)
 
 [node name="Obstacle" type="Node2D"]
 script = ExtResource("1_obstacle_script")
@@ -24,13 +18,10 @@ script = ExtResource("1_obstacle_script")
 collision_layer = 2
 collision_mask = 1
 
-[node name="TextureRect" type="TextureRect" parent="TopPipe"]
-offset_left = -40.0
-offset_top = -300.0
-offset_right = 40.0
-offset_bottom = 300.0
-texture = SubResource("GradientTexture2D_pipe")
-flip_v = true
+[node name="Sprite2D" type="Sprite2D" parent="TopPipe"]
+modulate = Color(0.25098, 0.803922, 0.501961, 1)
+scale = Vector2(0.625, 4.6875)
+texture = ExtResource("res://icon.svg")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TopPipe"]
 shape = SubResource("RectangleShape2D_pipe")
@@ -39,12 +30,10 @@ shape = SubResource("RectangleShape2D_pipe")
 collision_layer = 2
 collision_mask = 1
 
-[node name="TextureRect" type="TextureRect" parent="BottomPipe"]
-offset_left = -40.0
-offset_top = -300.0
-offset_right = 40.0
-offset_bottom = 300.0
-texture = SubResource("GradientTexture2D_pipe")
+[node name="Sprite2D" type="Sprite2D" parent="BottomPipe"]
+modulate = Color(0.25098, 0.803922, 0.501961, 1)
+scale = Vector2(0.625, 4.6875)
+texture = ExtResource("res://icon.svg")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BottomPipe"]
 shape = SubResource("RectangleShape2D_pipe")
@@ -58,7 +47,7 @@ position = Vector2(0, 0.5)
 shape = SubResource("RectangleShape2D_score")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
-position = Vector2(0, -1)
+position = Vector2(-1, -1)
 rect = Rect2(-41, -461, 82, 922)
 
 [connection signal="body_entered" from="ScoreArea" to="." method="_on_score_area_body_entered"]

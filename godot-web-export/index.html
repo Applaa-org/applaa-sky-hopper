@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #2c3e50; font-family: 'Arial', sans-serif; color: white; overflow: hidden; }
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #2c3e50; font-family: 'Arial', sans-serif; color: white; }
         #gameContainer { text-align: center; padding: 20px; }
         #gameCanvas { border: 3px solid #ecf0f1; border-radius: 8px; background: #73badb; box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3); display: block; margin: 20px auto; cursor: pointer; }
         h1 { color: #ecf0f1; margin-bottom: 10px; font-size: 32px; text-shadow: 2px 2px 4px rgba(0,0,0,0.4); }
@@ -26,51 +26,11 @@
         let score = 0;
         let frameCount = 0;
         let levelCompleteMessageTimeout = 0;
-        let shakeDuration = 0;
-        let shakeAmount = 15;
+        let flapAnimationTimeout = 0;
 
-        const player = { x: 100, y: 350, radius: 16, velocityY: 0, color: '#f1c40f', rotation: 0, bobOffset: 0 };
-        const gravity = 0.6;
-        const flapStrength = -10;
-
-        const levels = [
-            { speed: -2.5, gap: 250, interval: 120, scoreToAdvance:Of course. I apologize for the incomplete response. Here is the complete `index.html` file, with the unfinished code block and tag properly closed.
-
-<applaa-write path="godot-web-export/index.html" description="Completes the JavaScript preview, simulating the new realistic visuals, including parallax clouds, 3D pipes, and camera shake.">
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sky Hopper</title>
-    <meta charset="UTF-8">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #2c3e50; font-family: 'Arial', sans-serif; color: white; overflow: hidden; }
-        #gameContainer { text-align: center; padding: 20px; }
-        #gameCanvas { border: 3px solid #ecf_1; border-radius: 8px; background: #73badb; box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3); display: block; margin: 20px auto; cursor: pointer; }
-        h1 { color: #ecf_1; margin-bottom: 10px; font-size: 32px; text-shadow: 2px 2px 4px rgba(0,0,0,0.4); }
-        .info { color: #bdc3c7; font-size: 14px; margin-bottom: 20px; }
-    </style>
-</head>
-<body>
-    <div id="gameContainer">
-        <h1>🚀 Sky Hopper</h1>
-        <div class="info">Applaa Game Preview - Tap or Press Space to Flap</div>
-        <canvas id="gameCanvas" width="480" height="720"></canvas>
-    </div>
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        let gameState = 'start';
-        let score = 0;
-        let frameCount = 0;
-        let levelCompleteMessageTimeout = 0;
-        let shakeDuration = 0;
-        let shakeAmount = 15;
-
-        const player = { x: 100, y: 350, radius: 16, velocityY: 0, color: '#f1c40f', rotation: 0, bobOffset: 0 };
-        const gravity = 0.6; // Increased gravity
-        const flapStrength = -10; // Stronger flap
+        const player = { x: 100, y: 350, radius: 16, velocityY: 0, rotation: 0, bobOffset: 0 };
+        const gravity = 0.5;
+        const flapStrength = -9;
 
         const levels = [
             { speed: -2.0, gap: 250, interval: 120, scoreToAdvance: 5 },
@@ -86,34 +46,12 @@
         let obstacles = [];
         let particles = [];
 
-        // Parallax clouds
-        const clouds = [
-            { x: 150, y: 200, size: 60, speed: 0.2 },
-            { x: 600, y: 300, size: 80, speed: 0.2 },
-            { x: 300, y: 400, size: 90, speed: 0.4 },
-            { x: 800, y: 250, size: 70, speed: 0.4 }
-        ];
-
-        function updateLevelParameters() {
-            const levelData = levels[currentLevelIndex];
-            obstacleSpeed = levelData.speed;
-            obstacleGap = levelData.gap;
-            obstacleInterval = levelData.interval;
-        }
-
-        function triggerShake(duration) {
-            shakeDuration = duration;
-        }
-
         function createDeathParticles() {
             for (let i = 0; i < 50; i++) {
                 particles.push({
-                    x: player.x,
-                    y: player.y,
-                    vx: (Math.random() - 0.5) * 8,
-                    vy: (Math.random() - 0.5) * 8,
-                    life: 60,
-                    color: player.color
+                    x: player.x, y: player.y,
+                    vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8,
+                    life: 60, color: '#f1c40f'
                 });
             }
         }
@@ -134,15 +72,12 @@
         function handleInput(e) {
             if (e.code === 'Space' || e.type === 'mousedown') {
                 switch (gameState) {
-                    case 'start':
-                        resetGame();
-                        break;
+                    case 'start': resetGame(); break;
                     case 'playing':
                         player.velocityY = flapStrength;
+                        flapAnimationTimeout = 18; // 0.3 seconds at 60fps
                         break;
-                    case 'gameOver':
-                        gameState = 'start';
-                        break;
+                    case 'gameOver': gameState = 'start'; break;
                 }
             }
         }
@@ -154,12 +89,11 @@
             if (gameState === 'playing') {
                 player.velocityY += gravity;
                 player.y += player.velocityY;
-                player.rotation = player.velocityY * 0.08; // More pronounced rotation
+                player.rotation = player.velocityY * 0.05;
                 player.bobOffset = Math.sin(frameCount * 0.1) * 3;
 
                 if (player.y + player.radius > 720 - 50 || player.y - player.radius < 0) {
                     createDeathParticles();
-                    triggerShake(15);
                     gameState = 'gameOver';
                 }
 
@@ -176,7 +110,6 @@
                     if (player.x + player.radius > obs.x && player.x - player.radius < obs.x + obstacleWidth) {
                         if (player.y - player.radius < topPipeBottom || player.y + player.radius > bottomPipeTop) {
                             createDeathParticles();
-                            triggerShake(15);
                             gameState = 'gameOver';
                         }
                     }
@@ -191,87 +124,218 @@
                         }
                     }
                 });
-
                 obstacles = obstacles.filter(obs => obs.x + obstacleWidth > 0);
             }
 
             if (levelCompleteMessageTimeout > 0) levelCompleteMessageTimeout--;
-            if (shakeDuration > 0) shakeDuration--;
-
-            // Update particles
-            particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.2; // Gravity on particles
-                p.life--;
-            });
+            if (flapAnimationTimeout > 0) flapAnimationTimeout--;
+            
+            particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life--; });
             particles = particles.filter(p => p.life > 0);
+        }
+        
+        function drawPlayer()Of course. I apologize for the incomplete response. Here is the complete `index.html` file, with the unfinished code block and tag properly closed.
 
-            // Update clouds
-            clouds.forEach(cloud => {
-                cloud.x += obstacleSpeed * cloud.speed;
-                if (cloud.x + cloud.size < 0) {
-                    cloud.x = canvas.width + cloud.size;
+<applaa-write path="godot-web-export/index.html" description="Reverts the web preview to the simpler environment and updates the player drawing function to render the new, more detailed bird with an animated wing.">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sky Hopper</title>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #2c3e50; font-family: 'Arial', sans-serif; color: white; }
+        #gameContainer { text-align: center; padding: 20px; }
+        #gameCanvas { border: 3px solid #ecf0f1; border-radius: 8px; background: #73badb; box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3); display: block; margin: 20px auto; cursor: pointer; }
+        h1 { color: #ecf0f1; margin-bottom: 10px; font-size: 32px; text-shadow: 2px 2px 4px rgba(0,0,0,0.4); }
+        .info { color: #bdc3c7; font-size: 14px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <h1>🚀 Sky Hopper</h1>
+        <div class="info">Applaa Game Preview - Tap or Press Space to Flap</div>
+        <canvas id="gameCanvas" width="480" height="720"></canvas>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let gameState = 'start';
+        let score = 0;
+        let frameCount = 0;
+        let levelCompleteMessageTimeout = 0;
+        let flapAnimationTimeout = 0;
+
+        const player = { x: 100, y: 350, radius: 16, velocityY: 0, rotation: 0, bobOffset: 0 };
+        const gravity = 0.5;
+        const flapStrength = -9;
+
+        const levels = [
+            { speed: -2.0, gap: 250, interval: 120, scoreToAdvance: 5 },
+            { speed: -2.5, gap: 220, interval: 100, scoreToAdvance: 10 },
+            { speed: -3.0, gap: 200, interval: 90, scoreToAdvance: 999 }
+        ];
+        let currentLevelIndex = 0;
+        let obstacleSpeed = levels[currentLevelIndex].speed;
+        let obstacleGap = levels[currentLevelIndex].gap;
+        let obstacleInterval = levels[currentLevelIndex].interval;
+        const obstacleWidth = 80;
+
+        let obstacles = [];
+        let particles = [];
+
+        function updateLevelParameters() {
+            const levelData = levels[currentLevelIndex];
+            obstacleSpeed = levelData.speed;
+            obstacleGap = levelData.gap;
+            obstacleInterval = levelData.interval;
+        }
+
+        function createDeathParticles() {
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: player.x, y: player.y,
+                    vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8,
+                    life: 60, color: '#f1c40f'
+                });
+            }
+        }
+
+        function resetGame() {
+            currentLevelIndex = 0;
+            updateLevelParameters();
+            player.y = 350;
+            player.velocityY = 0;
+            player.rotation = 0;
+            score = 0;
+            obstacles = [];
+            particles = [];
+            frameCount = 0;
+            gameState = 'playing';
+        }
+
+        function handleInput(e) {
+            if (e.code === 'Space' || e.type === 'mousedown') {
+                switch (gameState) {
+                    case 'start': resetGame(); break;
+                    case 'playing':
+                        player.velocityY = flapStrength;
+                        flapAnimationTimeout = 18; // 0.3 seconds at 60fps
+                        break;
+                    case 'gameOver': gameState = 'start'; break;
                 }
-            });
+            }
+        }
+
+        document.addEventListener('mousedown', handleInput);
+        document.addEventListener('keydown', handleInput);
+
+        function update() {
+            if (gameState === 'playing') {
+                player.velocityY += gravity;
+                player.y += player.velocityY;
+                player.rotation = player.velocityY * 0.05;
+                player.bobOffset = Math.sin(frameCount * 0.1) * 3;
+
+                if (player.y + player.radius > 720 - 50 || player.y - player.radius < 0) {
+                    createDeathParticles();
+                    gameState = 'gameOver';
+                }
+
+                frameCount++;
+                if (frameCount % obstacleInterval === 0) {
+                    const gapY = Math.random() * (canvas.height - obstacleGap - 300) + 150;
+                    obstacles.push({ x: canvas.width, y: gapY, scored: false });
+                }
+
+                obstacles.forEach(obs => {
+                    obs.x += obstacleSpeed;
+                    const topPipeBottom = obs.y - obstacleGap / 2;
+                    const bottomPipeTop = obs.y + obstacleGap / 2;
+                    if (player.x + player.radius > obs.x && player.x - player.radius < obs.x + obstacleWidth) {
+                        if (player.y - player.radius < topPipeBottom || player.y + player.radius > bottomPipeTop) {
+                            createDeathParticles();
+                            gameState = 'gameOver';
+                        }
+                    }
+                    if (!obs.scored && obs.x + obstacleWidth < player.x) {
+                        score++;
+                        obs.scored = true;
+                        const levelData = levels[currentLevelIndex];
+                        if (score >= levelData.scoreToAdvance && currentLevelIndex < levels.length - 1) {
+                            currentLevelIndex++;
+                            updateLevelParameters();
+                            levelCompleteMessageTimeout = 120;
+                        }
+                    }
+                });
+                obstacles = obstacles.filter(obs => obs.x + obstacleWidth > 0);
+            }
+
+            if (levelCompleteMessageTimeout > 0) levelCompleteMessageTimeout--;
+            if (flapAnimationTimeout > 0) flapAnimationTimeout--;
+            
+            particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life--; });
+            particles = particles.filter(p => p.life > 0);
         }
         
         function drawPlayer() {
             ctx.save();
             ctx.translate(player.x, player.y + player.bobOffset);
             ctx.rotate(player.rotation);
-            
-            ctx.fillStyle = player.color;
+
+            // Body
+            ctx.fillStyle = '#f1c40f';
             ctx.beginPath();
-            ctx.moveTo(-15, 0);
-            ctx.lineTo(0, -12);
-            ctx.lineTo(10, -8);
+            ctx.moveTo(-10, 10);
+            ctx.lineTo(-15, 0);
+            ctx.lineTo(-10, -10);
+            ctx.lineTo(10, -12);
             ctx.lineTo(20, 0); // Beak
-            ctx.lineTo(10, 8);
-            ctx.lineTo(0, 12);
+            ctx.lineTo(10, 12);
             ctx.closePath();
             ctx.fill();
 
+            // Wing
+            ctx.save();
+            ctx.translate(-2, 0);
+            let wingRotation = 0;
+            if (flapAnimationTimeout > 0) {
+                const animationProgress = (18 - flapAnimationTimeout) / 18;
+                if (animationProgress < 0.5) {
+                    wingRotation = -45 * (animationProgress / 0.5);
+                } else {
+                    wingRotation = -45 * ((1 - animationProgress) / 0.5);
+                }
+            }
+            ctx.rotate(wingRotation * Math.PI / 180);
+            ctx.fillStyle = '#d4ac0d';
+            ctx.beginPath();
+            ctx.moveTo(0, -8);
+            ctx.lineTo(10, 0);
+            ctx.lineTo(0, 8);
+            ctx.lineTo(-10, 5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+
+            // Eye
             ctx.fillStyle = '#333';
             ctx.beginPath();
-            ctx.arc(8, -2, 3, 0, Math.PI * 2);
+            ctx.arc(12, -3, 3, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.restore();
         }
 
         function render() {
-            ctx.save();
-            if (shakeDuration > 0) {
-                const shakeX = (Math.random() - 0.5) * shakeAmount;
-                const shakeY = (Math.random() - 0.5) * shakeAmount;
-                ctx.translate(shakeX, shakeY);
-            }
-
-            // Draw Sky Gradient
-            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            skyGradient.addColorStop(0, '#347ab1');
-            skyGradient.addColorStop(1, '#73badb');
-            ctx.fillStyle = skyGradient;
+            // Sky
+            ctx.fillStyle = '#73badb';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Clouds
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            clouds.forEach(cloud => {
-                ctx.beginPath();
-                ctx.arc(cloud.x, cloud.y, cloud.size * 0.6, 0, Math.PI * 2);
-                ctx.arc(cloud.x + cloud.size * 0.5, cloud.y, cloud.size * 0.8, 0, Math.PI * 2);
-                ctx.arc(cloud.x - cloud.size * 0.5, cloud.y, cloud.size * 0.7, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            // Draw Pipes
-            const pipeGradient = ctx.createLinearGradient(0, 0, obstacleWidth, 0);
-            pipeGradient.addColorStop(0, '#1e965b');
-            pipeGradient.addColorStop(0.3, '#40cc80');
-            pipeGradient.addColorStop(0.7, '#267a4c');
-            pipeGradient.addColorStop(1, '#175a36');
-            ctx.fillStyle = pipeGradient;
+            // Obstacles
+            ctx.fillStyle = '#27ae60';
             obstacles.forEach(obs => {
                 const topPipeHeight = obs.y - obstacleGap / 2;
                 const bottomPipeHeight = canvas.height - (obs.y + obstacleGap / 2);
@@ -279,8 +343,8 @@
                 ctx.fillRect(obs.x, obs.y + obstacleGap / 2, obstacleWidth, bottomPipeHeight);
             });
             
-            // Draw Ground
-            ctx.fillStyle = '#74ad52';
+            // Ground
+            ctx.fillStyle = '#dfc680';
             ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
 
             if (gameState === 'start') {
@@ -335,7 +399,6 @@
                     ctx.fillText('Tap to Restart', canvas.width / 2, canvas.height / 2 + 50);
                 }
             }
-            ctx.restore();
         }
 
         function gameLoop() {
