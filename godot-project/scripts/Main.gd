@@ -8,6 +8,7 @@ extends Node
 @onready var ground1 = $Ground1
 @onready var ground2 = $Ground2
 @onready var level_manager = $LevelManager
+@onready var camera = $Camera2D
 
 var scroll_speed = 150.0
 var score = 0
@@ -66,6 +67,7 @@ func _on_obstacle_timer_timeout():
 	obstacle.add_to_group("obstacles")
 
 func _on_player_hit():
+	camera.shake(15, 0.3)
 	set_physics_process(false)
 	obstacle_timer.stop()
 	
@@ -85,5 +87,4 @@ func _on_obstacle_scored():
 			hud.update_level(level_manager.get_level_number())
 			hud.show_level_complete()
 		else:
-			# Game win condition can be handled here
 			pass

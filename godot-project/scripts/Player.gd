@@ -2,12 +2,13 @@ extends CharacterBody2D
 
 signal hit
 
-const FLAP_VELOCITY = -350.0
-var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
+const FLAP_VELOCITY = -450.0
+var gravity = ProjectSettings.get_setting("physics/2d/default_gravity") * 1.5 # Increased gravity
 
 @onready var bird_shape = $BirdShape
 @onready var animation_player = $AnimationPlayer
 @onready var trail = $TrailParticles
+@onready var death_particles = $DeathParticles
 @onready var collision_shape = $CollisionShape2D
 
 var is_dead = false
@@ -19,7 +20,8 @@ func _ready():
 func _physics_process(delta):
 	velocity.y += gravity * delta
 	
-	bird_shape.rotation = lerp_angle(bird_shape.rotation, deg_to_rad(velocity.y / 20.0), delta * 5)
+	# More responsive rotation
+	bird_shape.rotation = lerp_angle(bird_shape.rotation, deg_to_rad(velocity.y / 10.0), delta * 5)
 
 	var collision = move_and_collide(velocity * delta)
 	if collision:
@@ -50,13 +52,11 @@ func die():
 	if is_dead: return
 	is_dead = true
 	
+	death_particles.emitting = true
 	set_physics_process(false)
 	collision_shape.disabled = true
 	trail.emitting = false
 	animation_player.stop()
 	emit_signal("hit")
 	
-	var tween = create_tween()
-	tween.tween_property(bird_shape, "modulate", Color.RED, 0.1)
-	await tween.finished
 	hide()
