@@ -1,0 +1,4 @@
+[gd_resource type="SystemFont" format=3 uid="uid://csm7og2q5g0vj"]
+
+[resource]
+font_names = PackedStringArray("Liberation Sans", "Arial")
