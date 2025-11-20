@@ -8,6 +8,7 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer
 @onready var trail = $TrailParticles
+@onready var collision_shape = $CollisionShape2D
 
 func _ready():
 	set_physics_process(false)
@@ -16,14 +17,14 @@ func _ready():
 func _physics_process(delta):
 	velocity.y += gravity * delta
 	
-	# Rotate player based on velocity
 	sprite.rotation = lerp_angle(sprite.rotation, deg_to_rad(velocity.y / 20.0), delta * 5)
 
 	var collision = move_and_collide(velocity * delta)
 	if collision:
 		die()
 	
-	if position.y > get_viewport_rect().size.y:
+	# Fallback for falling out of the world
+	if position.y > get_viewport_rect().size.y + 50:
 		die()
 
 func _unhandled_input(event):
@@ -34,17 +35,21 @@ func _unhandled_input(event):
 
 func start():
 	set_physics_process(true)
+	collision_shape.disabled = false
 	trail.emitting = true
 	position = Vector2(100, 350)
 	velocity = Vector2.ZERO
 	sprite.rotation = 0
+	show()
 
 func die():
+	if not is_physics_processing(): return # Prevent dying multiple times
 	set_physics_process(false)
+	collision_shape.disabled = true
 	trail.emitting = false
 	emit_signal("hit")
-	# Simple death animation placeholder
+	
 	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color(1, 0.5, 0.5, 0.5), 0.1)
-	tween.tween_property(sprite, "scale", Vector2(1.2, 1.2), 0.1).set_trans(Tween.TRANS_BOUNCE)
-	tween.tween_property(sprite, "scale", Vector2(0, 0), 0.2).set_delay(0.1)
+	tween.tween_property(sprite, "modulate", Color.RED, 0.1)
+	await tween.finished
+	hide()

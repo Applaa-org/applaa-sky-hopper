@@ -5,7 +5,6 @@ extends Node
 @onready var player = $Player
 @onready var obstacle_timer = $ObstacleTimer
 @onready var hud = $HUD
-@onready var parallax_background = $ParallaxBackground
 @onready var ground1 = $Ground1
 @onready var ground2 = $Ground2
 
@@ -19,7 +18,6 @@ func _ready():
 	hud.show_start_screen()
 	player.hit.connect(_on_player_hit)
 	set_physics_process(false)
-	# Calculate ground width for seamless looping
 	ground_width = ground1.get_node("ColorRect").size.x
 
 func new_game():
@@ -30,23 +28,16 @@ func new_game():
 	obstacle_timer.start()
 	set_physics_process(true)
 	
-	# Reset ground positions
 	ground1.position.x = 0
 	ground2.position.x = ground_width
 	
-	# Clear any existing obstacles
 	for n in get_tree().get_nodes_in_group("obstacles"):
 		n.queue_free()
 
 func _physics_process(delta):
-	# Scroll parallax background
-	parallax_background.scroll_offset.x += SCROLL_SPEED * 0.5 * delta
-	
-	# Scroll ground
 	ground1.position.x -= SCROLL_SPEED * delta
 	ground2.position.x -= SCROLL_SPEED * delta
 	
-	# Loop ground
 	if ground1.position.x < -ground_width:
 		ground1.position.x += 2 * ground_width
 	if ground2.position.x < -ground_width:

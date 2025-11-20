@@ -25,7 +25,7 @@
         #gameCanvas {
             border: 3px solid #2c3e50;
             border-radius: 8px;
-            background: #87CEEB; /* Sky Blue */
+            background: #73badb; /* Updated background color */
             box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
             display: block;
             margin: 20px auto;
@@ -109,18 +109,134 @@
             player.velocityY += gravity;
             player.y += player.velocityY;
 
-            if (player.y + player.radius > canvas.height - 20) { // Ground collision
+            if (player.y + player.radius > canvas.height -Of course. I apologize for the incomplete response. Here is the complete `index.html` file, with the unfinished code block and tag properly closed.
+
+<applaa-write path="godot-web-export/index.html" description="Completes the JavaScript preview for Sky Hopper, ensuring all functions are implemented and the file is properly structured.">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sky Hopper</title>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #3498db;
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+        #gameContainer {
+            text-align: center;
+            padding: 20px;
+        }
+        #gameCanvas {
+            border: 3px solid #2c3e50;
+            border-radius: 8px;
+            background: #73badb; /* Updated background color */
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+            display: block;
+            margin: 20px auto;
+            cursor: pointer;
+        }
+        h1 {
+            color: #ecf0f1;
+            margin-bottom: 10px;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+        }
+        .info {
+            color: #bdc3c7;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <h1>🚀 Sky Hopper</h1>
+        <div class="info">Applaa Game Preview - Tap or Press Space to Flap</div>
+        <canvas id="gameCanvas" width="480" height="720"></canvas>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let gameState = 'start'; // 'start', 'playing', 'gameOver'
+        let score = 0;
+        let frameCount = 0;
+
+        const player = {
+            x: 100,
+            y: 350,
+            radius: 20,
+            velocityY: 0,
+            color: '#f1c40f'
+        };
+
+        const gravity = 0.6;
+        const flapStrength = -10;
+        const obstacleSpeed = -3;
+        const obstacleGap = 200;
+        const obstacleWidth = 80;
+        const obstacleInterval = 100;
+
+        let obstacles = [];
+
+        function resetGame() {
+            player.y = 350;
+            player.velocityY = 0;
+            score = 0;
+            obstacles = [];
+            frameCount = 0;
+            gameState = 'playing';
+        }
+
+        function handleInput(e) {
+            if (e.code === 'Space' || e.type === 'mousedown') {
+                switch (gameState) {
+                    case 'start':
+                        resetGame();
+                        break;
+                    case 'playing':
+                        player.velocityY = flapStrength;
+                        break;
+                    case 'gameOver':
+                        gameState = 'start';
+                        break;
+                }
+            }
+        }
+
+        document.addEventListener('mousedown', handleInput);
+        document.addEventListener('keydown', handleInput);
+
+        function update() {
+            if (gameState !== 'playing') return;
+
+            player.velocityY += gravity;
+            player.y += player.velocityY;
+
+            // Ground collision (ground is 50px high)
+            if (player.y + player.radius > canvas.height - 50) {
                 gameState = 'gameOver';
             }
             
-            if (player.y - player.radius < 0) { // Ceiling collision
+            // Ceiling collision
+            if (player.y - player.radius < 0) {
                 player.y = player.radius;
                 player.velocityY = 0;
             }
 
             frameCount++;
             if (frameCount % obstacleInterval === 0) {
-                const gapY = Math.random() * (canvas.height - obstacleGap - 200) + 100;
+                const gapY = Math.random() * (canvas.height - obstacleGap - 250) + 125;
                 obstacles.push({
                     x: canvas.width,
                     y: gapY,
@@ -150,25 +266,22 @@
         }
 
         function render() {
-            ctx.fillStyle = '#87CEEB';
+            // Clear canvas (sky background)
+            ctx.fillStyle = '#73badb';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#2# ... continuing from above
-<applaa-write path="godot-web-export/index.html" description="Updates the JavaScript preview for Sky Hopper to ensure it reflects the latest game logic and provides a consistent experience.">
-7ae60'; // Green
+            // Draw obstacles
+            ctx.fillStyle = '#27ae60';
             obstacles.forEach(obs => {
                 const topPipeHeight = obs.y - obstacleGap / 2;
                 const bottomPipeHeight = canvas.height - (obs.y + obstacleGap / 2);
-                // Top pipe
                 ctx.fillRect(obs.x, 0, obstacleWidth, topPipeHeight);
-                // Bottom pipe
                 ctx.fillRect(obs.x, obs.y + obstacleGap / 2, obstacleWidth, bottomPipeHeight);
             });
             
             // Draw ground
-            ctx.fillStyle = '#e67e22'; // Carrot orange ground
-            ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
-
+            ctx.fillStyle = '#dfc680';
+            ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
 
             if (gameState === 'start') {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
@@ -215,7 +328,6 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // Start the game loop
         gameLoop();
     </script>
 </body>
