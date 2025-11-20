@@ -10,6 +10,8 @@ var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var trail = $TrailParticles
 @onready var collision_shape = $CollisionShape2D
 
+var is_dead = false
+
 func _ready():
 	set_physics_process(false)
 	trail.emitting = false
@@ -23,7 +25,6 @@ func _physics_process(delta):
 	if collision:
 		die()
 	
-	# Fallback for falling out of the world
 	if position.y > get_viewport_rect().size.y + 50:
 		die()
 
@@ -34,16 +35,20 @@ func _unhandled_input(event):
 		trail.restart()
 
 func start():
+	is_dead = false
 	set_physics_process(true)
 	collision_shape.disabled = false
 	trail.emitting = true
 	position = Vector2(100, 350)
 	velocity = Vector2.ZERO
 	sprite.rotation = 0
+	sprite.modulate = Color.WHITE
 	show()
 
 func die():
-	if not is_physics_processing(): return # Prevent dying multiple times
+	if is_dead: return # Prevent dying multiple times
+	is_dead = true
+	
 	set_physics_process(false)
 	collision_shape.disabled = true
 	trail.emitting = false

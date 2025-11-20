@@ -14,9 +14,11 @@ var score = 0
 var ground_width = 0
 
 func _ready():
+	# Connect to the HUD's signal. This is the core fix.
+	hud.start_game.connect(new_game)
+	
 	hud.update_score(score)
 	hud.show_start_screen()
-	player.hit.connect(_on_player_hit)
 	set_physics_process(false)
 	ground_width = ground1.get_node("ColorRect").size.x
 
@@ -59,6 +61,7 @@ func _on_player_hit():
 		n.stop()
 		
 	hud.show_game_over_screen(score)
+	player.hit.connect(_on_player_hit)
 
 func _on_obstacle_scored():
 	score += 1

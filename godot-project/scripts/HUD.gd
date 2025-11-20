@@ -1,12 +1,12 @@
 extends CanvasLayer
 
+signal start_game
+
 @onready var score_label = $ScoreLabel
 @onready var message_label = $MessageLabel
 @onready var start_button = $StartButton
 @onready var final_score_label = $GameOver/FinalScoreLabel
 @onready var game_over_container = $GameOver
-
-signal start_game
 
 func _ready():
 	start_button.pressed.connect(_on_start_button_pressed)
@@ -38,4 +38,5 @@ func show_game_over_screen(final_score):
 	start_button.hide()
 
 func _on_start_button_pressed():
-	get_tree().get_root().get_node("Main").new_game()
+	# Emit a signal instead of a direct call. This is much more reliable.
+	emit_signal("start_game")
