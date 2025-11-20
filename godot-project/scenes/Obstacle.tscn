@@ -1,4 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://d66666666666"]
+[gd_scene load_steps=5 format=3 uid="uid://d66666666666"]
+
+[ext_resource type="Script" path="res://scripts/Obstacle.gd" id="1_obstacle_script"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pipe"]
 size = Vector2(80, 600)
@@ -6,8 +8,11 @@ size = Vector2(80, 600)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_score"]
 size = Vector2(20, 200)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_notifier"]
+size = Vector2(82, 822)
+
 [node name="Obstacle" type="Node2D"]
-process_mode = 1
+script = ExtResource("1_obstacle_script")
 
 [node name="TopPipe" type="StaticBody2D" parent="."]
 position = Vector2(0, -400)
@@ -42,5 +47,9 @@ collision_mask = 1
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ScoreArea"]
 shape = SubResource("RectangleShape2D_score")
 
-[connection signal="body_entered" from="ScoreArea" to_parent]
-[connection signal="body_entered" from="ScoreArea" to="." method="_on_score_area_body_entered" flags=18]
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(-1, -1)
+shape = SubResource("RectangleShape2D_notifier")
+
+[connection signal="body_entered" from="ScoreArea" to="." method="_on_score_area_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]
