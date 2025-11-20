@@ -1,0 +1,29 @@
+{
+  "game": {
+    "name": "Sky Hopper",
+    "description": "A brutally simple, responsive, and punishing tap-to-fly game. Navigate the character through a series of pipe obstacles without crashing.",
+    "genre": "Arcade",
+    "version": "1.0.0"
+  },
+  "player": {
+    "name": "Hopper",
+    "type": "character",
+    "abilities": ["fly", "flap"]
+  },
+  "enemies": [],
+  "levels": [
+    {
+      "name": "Endless",
+      "background": "sky_parallax",
+      "obstacles": ["pipes"],
+      "spawnPoints": [{"x": 100, "y": 350}]
+    }
+  ],
+  "logic": {
+    "winCondition": "highest_score",
+    "loseCondition": "collision_obstacle_or_ground",
+    "scoring": {
+      "pointsPerObstacle": 1
+    }
+  }
+}

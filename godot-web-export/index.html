@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sky Hopper</title>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #3498db;
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+        #gameContainer {
+            text-align: center;
+            padding: 20px;
+        }
+        #gameCanvas {
+            border: 3px solid #2c3e50;
+            border-radius: 8px;
+            background: #87CEEB; /* Sky Blue */
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+            display: block;
+            margin: 20px auto;
+            cursor: pointer;
+        }
+        h1 {
+            color: #ecf0f1;
+            margin-bottom: 10px;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+        }
+        .info {
+            color: #bdc3c7;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <h1>🚀 Sky Hopper</h1>
+        <div class="info">Applaa Game Preview - Tap or Press Space to Flap</div>
+        <canvas id="gameCanvas" width="480" height="720"></canvas>
+    </div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Game state
+        let gameState = 'start'; // 'start# ... continuing from above
+<applaa-write path="godot-web-export/index.html" description="Replaces the old platformer preview with a new JavaScript implementation of Sky Hopper for a live web preview.">
+', 'playing', 'gameOver';
+        let score = 0;
+        let frameCount = 0;
+
+        // Player properties
+        const player = {
+            x: 100,
+            y: 350,
+            radius: 20,
+            velocityY: 0,
+            color: '#f1c40f' // Yellow
+        };
+
+        // Game properties
+        const gravity = 0.6;
+        const flapStrength = -10;
+        const obstacleSpeed = -3;
+        const obstacleGap = 200;
+        const obstacleWidth = 80;
+        const obstacleInterval = 100; // frames
+
+        let obstacles = [];
+
+        function resetGame() {
+            player.y = 350;
+            player.velocityY = 0;
+            score = 0;
+            obstacles = [];
+            frameCount = 0;
+            gameState = 'playing';
+        }
+
+        function handleInput(e) {
+            if (e.code === 'Space' || e.type === 'mousedown') {
+                switch (gameState) {
+                    case 'start':
+                        resetGame();
+                        break;
+                    case 'playing':
+                        player.velocityY = flapStrength;
+                        break;
+                    case 'gameOver':
+                        gameState = 'start';
+                        break;
+                }
+            }
+        }
+
+        document.addEventListener('mousedown', handleInput);
+        document.addEventListener('keydown', handleInput);
+
+        function update() {
+            if (gameState !== 'playing') return;
+
+            // Player physics
+            player.velocityY += gravity;
+            player.y += player.velocityY;
+
+            // Ground collision
+            if (player.y + player.radius > canvas.height) {
+                gameState = 'gameOver';
+            }
+            
+            // Ceiling collision
+            if (player.y - player.radius < 0) {
+                player.y = player.radius;
+                player.velocityY = 0;
+            }
+
+            // Obstacle logic
+            frameCount++;
+            if (frameCount % obstacleInterval === 0) {
+                const gapY = Math.random() * (canvas.height - obstacleGap - 200) + 100;
+                obstacles.push({
+                    x: canvas.width,
+                    y: gapY,
+                    scored: false
+                });
+            }
+
+            obstacles.forEach(obs => {
+                obs.x += obstacleSpeed;
+
+                // Collision detection
+                const topPipeBottom = obs.y - obstacleGap / 2;
+                const bottomPipeTop = obs.y + obstacleGap / 2;
+
+                if (player.x + player.radius > obs.x && player.x - player.radius < obs.x + obstacleWidth) {
+                    if (player.y - player.radius < topPipeBottom || player.y + player.radius > bottomPipeTop) {
+                        gameState = 'gameOver';
+                    }
+                }
+
+                // Scoring
+                if (!obs.scored && obs.x + obstacleWidth < player.x) {
+                    score++;
+                    obs.scored = true;
+                }
+            });
+
+            // Remove off-screen obstacles
+            obstacles = obstacles.filter(obs => obs.x + obstacleWidth > 0);
+        }
+
+        function render() {
+            // Clear canvas (sky background)
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw obstacles
+            ctx.fillStyle = '#27ae60'; // Green
+            obstacles.forEach(obs => {
+                const topPipeHeight = obs.y - obstacleGap / 2;
+                const bottomPipeHeight = canvas.height - (obs.y + obstacleGap / 2);
+                // Top pipe
+                ctx.fillRect(obs.x, 0, obstacleWidth, topPipeHeight);
+                // Bottom pipe
+                ctx.fillRect(obs.x, obs.y + obstacleGap / 2, obstacleWidth, bottomPipeHeight);
+            });
+            
+            // Draw ground
+            ctx.fillStyle = '#f39c12'; // Orange-ish ground
+            ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+
+
+            if (gameState === 'start') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.font = '48px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Sky Hopper', canvas.width / 2, canvas.height / 2 - 50);
+                ctx.font = '24px Arial';
+                ctx.fillText('Tap to Start', canvas.width / 2, canvas.height / 2);
+            } else if (gameState === 'playing' || gameState === 'gameOver') {
+                // Draw player
+                ctx.fillStyle = player.color;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw score
+                ctx.fillStyle = 'white';
+                ctx.font = '48px Arial';
+                ctx.textAlign = 'center';
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 2;
+                ctx.strokeText(score, canvas.width / 2, 100);
+                ctx.fillText(score, canvas.width / 2, 100);
+
+                if (gameState === 'gameOver') {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = 'white';
+                    ctx.font = '48px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 50);
+                    ctx.font = '24px Arial';
+                    ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2);
+                    ctx.fillText('Tap to Restart', canvas.width / 2, canvas.height / 2 + 50);
+                }
+            }
+        }
+
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+[gd_scene load_steps=4 format=3 uid="uid://d66666666666"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pipe"]
+size = Vector2(80, 600)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_score"]
+size = Vector2(20, 200)
+
+[node name="Obstacle" type="Node2D"]
+process_mode = 1
+
+[node name="TopPipe" type="StaticBody2D" parent="."]
+position = Vector2(0, -400)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="TopPipe"]
+modulate = Color(0.25098, 0.803922, 0.501961, 1)
+scale = Vector2(0.625, 4.6875)
+texture = ExtResource("res://icon.svg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopPipe"]
+shape = SubResource("RectangleShape2D_pipe")
+
+[node name="BottomPipe" type="StaticBody2D" parent="."]
+position = Vector2(0, 400)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="BottomPipe"]
+modulate = Color(0.25098, 0.803922, 0.501961, 1)
+scale = Vector2(0.625, 4.6875)
+texture = ExtResource("res://icon.svg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomPipe"]
+shape = SubResource("RectangleShape2D_pipe")
+
+[node name="ScoreArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ScoreArea"]
+shape = SubResource("RectangleShape2D_score")
+
+[connection signal="body_entered" from="ScoreArea" to_parent]
+[connection signal="body_entered" from="ScoreArea" to="." method="_on_score_area_body_entered" flags=18]

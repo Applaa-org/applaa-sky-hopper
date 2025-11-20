@@ -1,0 +1,50 @@
+[gd_scene load_steps=6 format=3 uid="uid://a88888888888"]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://c54444444444" path="res://scenes/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://d66666666666" path="res://scenes/Obstacle.tscn" id="3_obstacle"]
+[ext_resource type="PackedScene" uid="uid://b77777777777" path="res://scenes/HUD.tscn" id="4_hud"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
+size = Vector2(480, 50)
+
+[node name="Main" type="Node"]
+script = ExtResource("1_main")
+obstacle_scene = ExtResource("3_obstacle")
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+scroll_base_scale = Vector2(0.2, 0)
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.5, 1)
+motion_mirroring = Vector2(480, 0)
+
+[node name="BackgroundSprite" type="ColorRect" parent="ParallaxBackground/ParallaxLayer"]
+offset_right = 480.0
+offset_bottom = 720.0
+color = Color(0.45098, 0.729412, 0.882353, 1)
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(100, 350)
+
+[node name="ObstacleTimer" type="Timer" parent="."]
+wait_time = 1.5
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(240, 745)
+collision_layer = 2
+collision_mask = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="ColorRect" type="ColorRect" parent="Ground"]
+offset_left = -240.0
+offset_top = -25.0
+offset_right = 240.0
+offset_bottom = 25.0
+color = Color(0.870588, 0.788235, 0.501961, 1)
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]
+
+[connection signal="timeout" from="ObstacleTimer" to="." method="_on_obstacle_timer_timeout"]
