@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://d66666666666"]
+[gd_scene load_steps=4 format=3 uid="uid://d66666666666"]
 
 [ext_resource type="Script" path="res://scripts/Obstacle.gd" id="1_obstacle_script"]
 
@@ -8,9 +8,6 @@ size = Vector2(80, 600)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_score"]
 size = Vector2(20, 250)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_notifier"]
-size = Vector2(82, 922)
-
 [node name="Obstacle" type="Node2D"]
 script = ExtResource("1_obstacle_script")
 
@@ -18,10 +15,12 @@ script = ExtResource("1_obstacle_script")
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite2D" type="Sprite2D" parent="TopPipe"]
-modulate = Color(0.25098, 0.803922, 0.501961, 1)
-scale = Vector2(0.625, 4.6875)
-texture = ExtResource("res://icon.svg")
+[node name="ColorRect" type="ColorRect" parent="TopPipe"]
+offset_left = -40.0
+offset_top = -300.0
+offset_right = 40.0
+offset_bottom = 300.0
+color = Color(0.152941, 0.678431, 0.376471, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TopPipe"]
 shape = SubResource("RectangleShape2D_pipe")
@@ -30,10 +29,12 @@ shape = SubResource("RectangleShape2D_pipe")
 collision_layer = 2
 collision_mask = 1
 
-[node name="Sprite2D" type="Sprite2D" parent="BottomPipe"]
-modulate = Color(0.25098, 0.803922, 0.501961, 1)
-scale = Vector2(0.625, 4.6875)
-texture = ExtResource("res://icon.svg")
+[node name="ColorRect" type="ColorRect" parent="BottomPipe"]
+offset_left = -40.0
+offset_top = -300.0
+offset_right = 40.0
+offset_bottom = 300.0
+color = Color(0.152941, 0.678431, 0.376471, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BottomPipe"]
 shape = SubResource("RectangleShape2D_pipe")
@@ -47,7 +48,7 @@ position = Vector2(0, 0.5)
 shape = SubResource("RectangleShape2D_score")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
-position = Vector2(-1, -1)
+position = Vector2(0, -1)
 rect = Rect2(-41, -461, 82, 922)
 
 [connection signal="body_entered" from="ScoreArea" to="." method="_on_score_area_body_entered"]
