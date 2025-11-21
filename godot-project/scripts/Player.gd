@@ -2,60 +2,45 @@ extends CharacterBody2D
 
 signal hit
 
-const FLAP_VELOCITY = -350.0
+const FLAP_VELOCITY = -400.0
+
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
-
-@onready var bird_shape = $BirdShape
-@onready var animation_player = $AnimationPlayer
-@onready var trail = $TrailParticles
-@onready var death_particles = $DeathParticles
-@onready var collision_shape = $CollisionShape2D
-
-var is_dead = false
-
-func _ready():
-	set_physics_process(false)
-	trail.emitting = false
+var active = false
 
 func _physics_process(delta):
-	velocity.y += gravity * delta
-	
-	bird_shape.rotation = lerp_angle(bird_shape.rotation, deg_to_rad(velocity.y / 20.0), delta * 5)
+	if not active:
+		return
 
-	var collision = move_and_collide(velocity * delta)
-	if collision:
-		die()
-	
-	if position.y > get_viewport_rect().size.y + 50:
-		die()
+	# Add the gravity.
+	if not is_on_floor():
+		velocity.y += gravity * delta
 
-func _unhandled_input(event):
-	if event.is_action_pressed("flap"):
-		velocity.y = FLAP_VELOCITY
-		animation_player.play("flap")
-		trail.restart()
+	# Handle flap.
+	if Input.is_action_just_pressed("flap"):
+		flap()
+
+	move_and_slide()
+	
+	if get_slide_collision_count() > 0:
+		die()
 
 func start():
-	is_dead = false
 	set_physics_process(true)
-	collision_shape.disabled = false
-	trail.emitting = true
 	position = Vector2(100, 350)
 	velocity = Vector2.ZERO
-	bird_shape.rotation = 0
-	bird_shape.modulate = Color.WHITE
-	animation_player.play("bob")
+	active = false
 	show()
 
+func flap():
+	velocity.y = FLAP_VELOCITY
+
+func set_active(is_active):
+	active = is_active
+	if active:
+		# Give the first flap when activated
+		flap()
+
 func die():
-	if is_dead: return
-	is_dead = true
-	
-	death_particles.emitting = true
-	set_physics_process(false)
-	collision_shape.disabled = true
-	trail.emitting = false
-	animation_player.stop()
-	emit_signal("hit")
-	
+	hit.emit()
 	hide()
+	set_physics_process(false)

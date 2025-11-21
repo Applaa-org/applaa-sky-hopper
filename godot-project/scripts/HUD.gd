@@ -6,7 +6,7 @@ extends CanvasLayer
 @onready var level_complete_timer = $LevelCompleteTimer
 
 func _ready():
-	level_complete_timer.timeout.connect(message_label.hide)
+	level_complete_timer.timeout.connect(hide_message)
 
 func update_score(new_score):
 	score_label.text = str(new_score)
@@ -18,3 +18,10 @@ func show_level_complete():
 	message_label.text = "Level Complete!"
 	message_label.show()
 	level_complete_timer.start()
+
+func show_get_ready():
+	message_label.text = "Get Ready!"
+	message_label.show()
+
+func hide_message():
+	message_label.hide()

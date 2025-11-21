@@ -22,7 +22,7 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        let gameState = 'start'; // 'start', 'playing', 'gameOver'
+        let gameState = 'start'; // 'start', 'getReady', 'playing', 'gameOver'
         let score = 0;
         let frameCount = 0;
         let levelCompleteMessageTimeout = 0;
@@ -74,13 +74,18 @@
             obstacles = [];
             particles = [];
             frameCount = 0;
-            gameState = 'playing';
+            gameState = 'getReady';
         }
 
         function handleInput(e) {
             if (e.code === 'Space' || e.type === 'mousedown') {
                 switch (gameState) {
                     case 'start': resetGame(); break;
+                    case 'getReady':
+                        gameState = 'playing';
+                        player.velocityY = flapStrength;
+                        flapAnimationTimeout = 18;
+                        break;
                     case 'playing':
                         player.velocityY = flapStrength;
                         flapAnimationTimeout = 18;
@@ -95,6 +100,10 @@
 
         function update() {
             frameCount++;
+            if (gameState === 'getReady') {
+                player.y = 350 + Math.sin(frameCount * 0.05) * 15;
+                return;
+            }
             if (gameState !== 'playing') return;
 
             player.velocityY += gravity;
@@ -198,7 +207,6 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             if (gameState === 'start') {
-                // Animate player on start screen
                 player.x = 240;
                 player.y = 200 + Math.sin(frameCount * 0.05) * 15;
                 player.rotation = 0;
@@ -209,12 +217,9 @@
                 ctx.font = 'bold 64px Arial';
                 ctx.textAlign = 'center';
                 ctx.fillText('Sky Hopper', canvas.width / 2, canvas.height / 2 - 100);
-                
                 ctx.font = '24px Arial';
                 ctx.fillText('Tap or Press Space to Flap.', canvas.width / 2, canvas.height / 2 - 20);
                 ctx.fillText('Avoid the pipes!', canvas.width / 2, canvas.height / 2 + 20);
-                
-                // Draw a simulated button
                 const btnX = canvas.width / 2 - 100;
                 const btnY = canvas.height / 2 + 80;
                 const btnW = 200;
@@ -227,13 +232,15 @@
 
             } else {
                 // Obstacles
-                ctx.fillStyle = '#27ae60';
-                obstacles.forEach(obs => {
-                    const topPipeHeight = obs.y - obstacleGap / 2;
-                    const bottomPipeHeight = canvas.height - (obs.y + obstacleGap / 2);
-                    ctx.fillRect(obs.x, 0, obstacleWidth, topPipeHeight);
-                    ctx.fillRect(obs.x, obs.y + obstacleGap / 2, obstacleWidth, bottomPipeHeight);
-                });
+                if (gameState === 'playing') {
+                    ctx.fillStyle = '#27ae60';
+                    obstacles.forEach(obs => {
+                        const topPipeHeight = obs.y - obstacleGap / 2;
+                        const bottomPipeHeight = canvas.height - (obs.y + obstacleGap / 2);
+                        ctx.fillRect(obs.x, 0, obstacleWidth, topPipeHeight);
+                        ctx.fillRect(obs.x, obs.y + obstacleGap / 2, obstacleWidth, bottomPipeHeight);
+                    });
+                }
                 
                 // Ground
                 ctx.fillStyle = '#dfc680';
@@ -267,6 +274,13 @@
                     ctx.font = 'bold 40px Arial';
                     ctx.textAlign = 'center';
                     ctx.fillText('Level Complete!', canvas.width / 2, canvas.height / 2);
+                }
+
+                if (gameState === 'getReady') {
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 48px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Get Ready!', canvas.width / 2, canvas.height / 2);
                 }
 
                 if (gameState === 'gameOver') {
