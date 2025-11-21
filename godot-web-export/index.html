@@ -66,6 +66,7 @@
         function resetGame() {
             currentLevelIndex = 0;
             updateLevelParameters();
+            player.x = 100;
             player.y = 350;
             player.velocityY = 0;
             player.rotation = 0;
@@ -93,6 +94,7 @@
         document.addEventListener('keydown', handleInput);
 
         function update() {
+            frameCount++;
             if (gameState !== 'playing') return;
 
             player.velocityY += gravity;
@@ -105,7 +107,6 @@
                 gameState = 'gameOver';
             }
 
-            frameCount++;
             if (frameCount % obstacleInterval === 0) {
                 const gapY = Math.random() * (canvas.height - obstacleGap - 300) + 150;
                 obstacles.push({ x: canvas.width, y: gapY, scored: false });
@@ -197,6 +198,13 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             if (gameState === 'start') {
+                // Animate player on start screen
+                player.x = 240;
+                player.y = 200 + Math.sin(frameCount * 0.05) * 15;
+                player.rotation = 0;
+                player.bobOffset = 0;
+                drawPlayer();
+
                 ctx.fillStyle = 'white';
                 ctx.font = 'bold 64px Arial';
                 ctx.textAlign = 'center';

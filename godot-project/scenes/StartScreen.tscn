@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://d33333333333"]
+[gd_scene load_steps=3 format=3 uid="uid://d33333333333"]
 
 [ext_resource type="Script" path="res://scripts/StartScreen.gd" id="1_start_script"]
+[ext_resource type="PackedScene" uid="uid://c54444444444" path="res://scenes/Player.tscn" id="2_player"]
 
 [node name="StartScreen" type="Control"]
 layout_mode = 3
@@ -53,5 +54,8 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Start Game"
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(240, 200)
 
 [connection signal="pressed" from="VBoxContainer/StartButton" to="." method="_on_start_button_pressed"]
